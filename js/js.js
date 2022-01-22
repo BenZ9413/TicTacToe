@@ -35,6 +35,7 @@
 
 // Organizer module
 const Organizer = ((function() {
+    let gameMode = '';
     // askForGameMode
         // setup the main html with two buttons and labels
     function askForGameMode() {
@@ -74,16 +75,32 @@ const Organizer = ((function() {
     };
     
     function _addClickEventToNewGameButtons (btnPlayer, btnComputer) {
-        btnPlayer.addEventListener('click', _askForPlayerNames);
-        btnComputer.addEventListener('click', _askForPlayerNames);
+        btnPlayer.addEventListener('click', _prepareNewGame);
+        btnComputer.addEventListener('click', _prepareNewGame);
+    };
+
+    function _prepareNewGame (e) {
+        _setGameMode(e);
+        _askForPlayerNamesViaModal();
+    }
+    
+    // set the gameMode
+    function _setGameMode (e) {
+        if ((e.target.className).includes('Computer')) {
+            gameMode = 'computer';
+            alert('You want to play against the computer.');
+        } else {
+            gameMode = 'player';
+            alert('1 vs 1');
+        };
     };
 
     // askForPlayerNames
-    function _askForPlayerNames () {
-        alert('Whats your name?')
+    function _askForPlayerNamesViaModal () {
+        alert('Please enter your names');
+        // show Input Form that asks for Player names with one button to start the game
     };
-        // onClickEvent show Input Form that asks for Player names 
-        // one Button to start the game
+        
     // announceResult
         // showForm that announces the result
         // two buttons one for rematch and one for start screen
