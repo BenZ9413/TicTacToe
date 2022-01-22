@@ -36,10 +36,12 @@
 // Organizer module
 const Organizer = ((function() {
     // askForGameMode
+        // setup the main html with two buttons and labels
     function askForGameMode() {
         const main = document.querySelector('.main');
         
         let container = document.createElement('div');
+        container.classList = 'container';
         let gameModePlayer = document.createElement('div');
         let gameModeComputer = document.createElement('div');
 
@@ -67,9 +69,19 @@ const Organizer = ((function() {
 
         gameModeComputer.appendChild(labelComputer);
         gameModeComputer.appendChild(btnComputer);
+
+        _addClickEventToNewGameButtons(btnPlayer, btnComputer);
     };
-        // setup the main html with two buttons and labels
+    
+    function _addClickEventToNewGameButtons (btnPlayer, btnComputer) {
+        btnPlayer.addEventListener('click', _askForPlayerNames);
+        btnComputer.addEventListener('click', _askForPlayerNames);
+    };
+
     // askForPlayerNames
+    function _askForPlayerNames () {
+        alert('Whats your name?')
+    };
         // onClickEvent show Input Form that asks for Player names 
         // one Button to start the game
     // announceResult
