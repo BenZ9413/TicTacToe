@@ -44,12 +44,18 @@ const Organizer = ((function() {
         let gameModeComputer = document.createElement('div');
 
         let labelPlayer = document.createElement('div');
-        labelPlayer.textContent = '1 vs. 1'
+        labelPlayer.classList = 'label';
+        labelPlayer.textContent = '1 vs. 1';
         let btnPlayer = document.createElement('button');
+        btnPlayer.classList = 'btn btnPlayer';
+        btnPlayer.innerText = 'New Game';
 
         let labelComputer = document.createElement('div');
-        labelComputer.textContent = '1 vs. Computer'
+        labelPlayer.classList = 'label';
+        labelComputer.textContent = '1 vs. Computer';
         let btnComputer = document.createElement('button');
+        btnComputer.classList = 'btn btnComputer';
+        btnComputer.innerText = 'New Game';
 
         main.appendChild(container);
 
