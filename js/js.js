@@ -237,7 +237,7 @@ const Organizer = (function() {
         btnPlayer.innerText = 'New Game';
 
         let labelComputer = document.createElement('div');
-        labelPlayer.classList = 'label';
+        labelComputer.classList = 'label';
         labelComputer.textContent = '1 vs. Computer';
         let btnComputer = document.createElement('button');
         btnComputer.classList = 'btn btnComputer';
