@@ -81,47 +81,56 @@ const Organizer = ((function() {
 
     function _prepareNewGame (e) {
         _setGameMode(e);
-        _askForPlayerNamesViaModal();
+        _showHidePlayerNamesModal();
         _addClickEventStartGame();
+        _addEventListenerFormdata();
     }
     
     // set the gameMode
     function _setGameMode (e) {
         if ((e.target.className).includes('Computer')) {
-            gameMode = 'computer';
+            gameMode = '.playerName';
             alert('You want to play against the computer.');
         } else {
-            gameMode = 'player';
+            gameMode = '.playerNames';
             alert('1 vs 1');
         };
     };
 
-    // show Input Form that asks for Player names with one button to start the game
-    function _askForPlayerNamesViaModal () {
-        let inputClass = '';
-        if (gameMode === 'computer') {
-            inputClass = '.playerName';
-        } else {
-            inputClass = '.playerNames';
-        };
-        const userForm = document.querySelector(inputClass);
+    // show or hide Input Form that asks for Player names with one button to start the game
+    function _showHidePlayerNamesModal () {
+        const userForm = document.querySelector(gameMode);
         const overlay = document.querySelector('#overlay');
-        userForm.classList.add('active');
-        overlay.classList.add('active');
+        userForm.classList.toggle('active');
+        overlay.classList.toggle('active');
     };
 
     function _addClickEventStartGame () {
-        const btnStart = document.querySelectorAll('.btnStart');
-        btnStart.forEach (button => {
-            button.addEventListener('click', _startTheGame);
+        const userForm = document.querySelector(gameMode);
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            new FormData(userForm);
         });
     };
 
-    function _startTheGame () {
+    function _addEventListenerFormdata () {
+        const userForm = document.querySelector(gameMode);
+        userForm.addEventListener('formdata', (e) => {
+            let data = e.formData;
+            let values = [];
+            for (let value of data.values()) {
+                values.push(value);
+            };
+            console.log(values);
+            userForm.reset();
+            _showHidePlayerNamesModal();
+        });
+        
+
         // save the player names
         // hide the input form
         // create grid
-    }
+    };
         
     // announceResult
         // showForm that announces the result
