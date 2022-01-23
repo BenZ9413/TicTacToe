@@ -16,6 +16,10 @@
     // name
 
 // GameBoard module
+const Gameboard = (function(names) {
+    function startNewGame (names) {
+        console.log(names);
+    };
     // player choice array with 9 x null as value
     // create
         // create a 3 x 3 Grid with event listeners for click
@@ -32,9 +36,13 @@
         // set all of the array values to null again
     // delete
         // delete the whole grid and show start screen again
+    return {
+        startNewGame
+    };
+})();
 
 // Organizer module
-const Organizer = ((function() {
+const Organizer = (function() {
     let gameMode = '';
     // askForGameMode
         // setup the main html with two buttons and labels
@@ -113,23 +121,27 @@ const Organizer = ((function() {
         });
     };
 
+    //save Player names and hide input form
     function _addEventListenerFormdata () {
         const userForm = document.querySelector(gameMode);
         userForm.addEventListener('formdata', (e) => {
             let data = e.formData;
-            let values = [];
+            let names = [];
             for (let value of data.values()) {
-                values.push(value);
+                names.push(value);
             };
-            console.log(values);
             userForm.reset();
             _showHidePlayerNamesModal();
+            _deleteSetupElements();
+            Gameboard.startNewGame(names);
         });
-        
+    };
 
-        // save the player names
-        // hide the input form
-        // create grid
+    function _deleteSetupElements () {
+        const main = document.querySelector('.main');
+        while (main.firstChild) {
+            main.removeChild(main.lastChild);
+        };
     };
         
     // announceResult
@@ -140,7 +152,7 @@ const Organizer = ((function() {
     return {
         askForGameMode
     };
-}))();
+})();
     
 // IFFE
 (function() {
