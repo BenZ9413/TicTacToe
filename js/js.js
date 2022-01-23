@@ -20,14 +20,23 @@ const Gameboard = (function(names) {
     // player choice array with 9 x null as value
     const playerChoice = [null, null, null, null, null, null, null, null, null];
 
+    let player1 = '';
+    let player2 = '';
+    let turn = '';
+
     // create a 3 x 3 Grid with event listeners for click
     // create text field which shows who's turn it is
     function startNewGame (names) {
+        player1 = names [0];
+        player2 = names [1];
+
+        turn = player1;
+
         const main = document.querySelector('.main');
 
         const displayTurn = document.createElement('div');
         displayTurn.classList = 'displayTurn';
-        displayTurn.textContent = `It's your turn ${names[0]}`;
+        displayTurn.textContent = `It's your turn ${turn}`;
         const gridContainer = document.createElement('div');
         gridContainer.classList = 'gridContainer';
 
@@ -65,17 +74,40 @@ const Gameboard = (function(names) {
     function _checkForValidMove (e) {
         if (e.target.textContent == '') {
             _savePlayerChoice(e);
+            _displayPlayerChoice();
+            _changeTurn();
         };
     };
 
+    // either save X or # as players choice
     function _savePlayerChoice (e) {
         console.log(e);
         console.log(e.target.dataset.id);
         playerChoice[e.target.dataset.id] = 'X';
         console.log(playerChoice);
     };
-        // either save X or # as players choice
-    // displayPlayerChoice
+        
+    function _displayPlayerChoice () {
+        const gridFields = document.querySelectorAll('.gridField');
+        let count = 0;
+        gridFields.forEach (field => {
+            if (playerChoice[count] !== null) {
+                field.textContent = playerChoice[count];
+            };
+            count++;
+        });
+    };
+
+    function _changeTurn () {
+        if (turn === player1) {
+            turn = player2;
+        } else {
+            turn = player1;
+        };
+
+        const displayTurn = document.querySelector('.displayTurn');
+        displayTurn.textContent = `It's your turn ${turn}`;
+    };
         // display the array on screen inside of the assigned grid fields
     // checkForResult
         // checks array for win or draw pattern
