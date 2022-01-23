@@ -17,6 +17,11 @@
 
 // GameBoard module
 const Gameboard = (function(names) {
+    // player choice array with 9 x null as value
+    const playerChoice = [null, null, null, null, null, null, null, null, null];
+
+    // create a 3 x 3 Grid with event listeners for click
+    // create text field which shows who's turn it is
     function startNewGame (names) {
         const main = document.querySelector('.main');
 
@@ -39,21 +44,36 @@ const Gameboard = (function(names) {
             let repeat = 0;
             while (repeat < 3) {
                 let gridField = document.createElement('div');
-                gridField.classList = `gridField field${countField}`
+                gridField.classList = `gridField field${countField}`;
+                gridField.setAttribute('data-id', `${countField}`);
                 gridRow.appendChild(gridField);
                 repeat++;
                 countField++;
             };
             countRow++;
         };
+        _addEventListenerPlayerChoice();
     };
-    // player choice array with 9 x null as value
-    // create
-        // create a 3 x 3 Grid with event listeners for click
-        // create text field which shows who's turn it is
-    // checkForValidMove
-        // check if value in array is null
-    // savePlayerChoice
+
+    function _addEventListenerPlayerChoice () {
+        const griedFields = document.querySelectorAll('.gridField');
+        griedFields.forEach (field => {
+            field.addEventListener('click', _checkForValidMove);
+        });
+    };
+    
+    function _checkForValidMove (e) {
+        if (e.target.textContent == '') {
+            _savePlayerChoice(e);
+        };
+    };
+
+    function _savePlayerChoice (e) {
+        console.log(e);
+        console.log(e.target.dataset.id);
+        playerChoice[e.target.dataset.id] = 'X';
+        console.log(playerChoice);
+    };
         // either save X or # as players choice
     // displayPlayerChoice
         // display the array on screen inside of the assigned grid fields
