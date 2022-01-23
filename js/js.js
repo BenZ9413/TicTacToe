@@ -276,10 +276,8 @@ const Organizer = (function() {
     function _setGameMode (e) {
         if ((e.target.className).includes('Computer')) {
             gameMode = '.playerName';
-            alert('You want to play against the computer.');
         } else {
             gameMode = '.playerNames';
-            alert('1 vs 1');
         };
     };
 
