@@ -18,7 +18,34 @@
 // GameBoard module
 const Gameboard = (function(names) {
     function startNewGame (names) {
-        console.log(names);
+        const main = document.querySelector('.main');
+
+        const displayTurn = document.createElement('div');
+        displayTurn.classList = 'displayTurn';
+        displayTurn.textContent = `It's your turn ${names[0]}`;
+        const gridContainer = document.createElement('div');
+        gridContainer.classList = 'gridContainer';
+
+        main.appendChild(displayTurn);
+        main.appendChild(gridContainer);
+
+        let countRow = 0;
+        let countField = 0;
+
+        while (countRow<3) {
+            let gridRow = document.createElement('div');
+            gridRow.classList = `gridRow row${countRow}`
+            gridContainer.appendChild(gridRow);
+            let repeat = 0;
+            while (repeat < 3) {
+                let gridField = document.createElement('div');
+                gridField.classList = `gridField field${countField}`
+                gridRow.appendChild(gridField);
+                repeat++;
+                countField++;
+            };
+            countRow++;
+        };
     };
     // player choice array with 9 x null as value
     // create
