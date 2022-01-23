@@ -18,8 +18,8 @@
 // GameBoard module
 const Gameboard = (function(names) {
     // player choice array with 9 x null as value
-    const playerChoice = [null, null, null, null, null, null, null, null, null];
-    const winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
+    let playerChoice = [];
+    let winPatterns = [];
 
     let player1 = '';
     let player2 = '';
@@ -30,6 +30,9 @@ const Gameboard = (function(names) {
     function startNewGame (names) {
         player1 = names [0];
         player2 = names [1];
+
+        playerChoice = [null, null, null, null, null, null, null, null, null];
+        winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
 
         turn = player1;
 
@@ -69,6 +72,13 @@ const Gameboard = (function(names) {
         const griedFields = document.querySelectorAll('.gridField');
         griedFields.forEach (field => {
             field.addEventListener('click', _checkForValidMove);
+        });
+    };
+
+    function _removeEventListenerPlayerChoice () {
+        const griedFields = document.querySelectorAll('.gridField');
+        griedFields.forEach (field => {
+            field.removeEventListener('click', _checkForValidMove);
         });
     };
     
@@ -141,16 +151,61 @@ const Gameboard = (function(names) {
     };
 
     function _displayResult (result) {
+        const main = document.querySelector('.main');
+        const resultLabel = document.createElement('div');
+        resultLabel.classList = 'resultLabel';
+        const resultBtnContainer = document.createElement('div');
+        resultBtnContainer.classList = 'resultBtnContainer';
+        const btnReset = document.createElement('button');
+        btnReset.classList = 'btnReset';
+        btnReset.innerText = 'Rematch';
+        const btnReturn = document.createElement('button');
+        btnReturn.classList = 'btnReturn';
+        btnReturn.innerText = 'Select Game Mode';
+
         if (result === '') {
-            alert('It\'s a draw!');
+            resultLabel.textContent = 'It\'s a draw!';
         } else {
-            alert(`The winner is ${result}!`);
+            resultLabel.textContent = `The winner is ${result}!`;
+        };
+
+        main.appendChild(resultLabel);
+        main.appendChild(resultBtnContainer);
+        resultBtnContainer.appendChild(btnReset);
+        resultBtnContainer.appendChild(btnReturn);
+
+        _addClickEventToResetButton(btnReset);
+        _addClickEventToReturnButton(btnReturn);
+
+        _removeEventListenerPlayerChoice();
+    };
+
+    function _addClickEventToResetButton (btnReset) {
+        btnReset.addEventListener('click', _reset);
+    };
+
+    function _addClickEventToReturnButton (btnReturn) {
+        btnReturn.addEventListener('click', _return);
+    }
+
+    // reset
+    function _reset () {
+        _delete();
+        startNewGame([player1, player2]);
+    };
+        // set all of the array values to null again
+    // delete
+    function _delete () {
+        const main = document.querySelector('.main');
+        while (main.firstChild) {
+            main.removeChild(main.lastChild);
         };
     };
 
-    // reset
-        // set all of the array values to null again
-    // delete
+    function _return () {
+        _delete();
+        Organizer.askForGameMode();
+    };
         // delete the whole grid and show start screen again
     return {
         startNewGame
@@ -160,9 +215,11 @@ const Gameboard = (function(names) {
 // Organizer module
 const Organizer = (function() {
     let gameMode = '';
+    let first = true;
     // askForGameMode
         // setup the main html with two buttons and labels
     function askForGameMode() {
+        gameMode = '';
         const main = document.querySelector('.main');
         
         let container = document.createElement('div');
@@ -206,9 +263,12 @@ const Organizer = (function() {
     function _prepareNewGame (e) {
         _setGameMode(e);
         _showHidePlayerNamesModal();
-        _addClickEventStartGame();
-        _addEventListenerFormdata();
-    }
+        if (first == true) {
+            _addClickEventStartGame();
+            _addEventListenerFormdata();
+            first = false;
+        };
+    };
     
     // set the gameMode
     function _setGameMode (e) {
