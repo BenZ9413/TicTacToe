@@ -12,10 +12,13 @@ body {
 
 main {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 66%;
     background-color: #8EA8C3;
+    gap: 10px;
+    padding: 10px;
 }
 
 header,
@@ -119,7 +122,7 @@ footer {
 }
 
 .gridContainer {
-    border: 3px solid black;
+    border: 3px solid #161925;
     width: 300px;
     height: 300px;
 }
@@ -140,10 +143,39 @@ footer {
 .field1,
 .field4,
 .field7 {
-    border-right: 1px solid black;
+    border-right: 1px solid #161925;
 }
 
 .row0,
 .row1 {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #161925;
+}
+
+.displayTurn,
+.resultLabel {
+    font-weight: bold;
+    color: #161925;
+}
+
+.gridField {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.resultBtnContainer {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+}
+
+.btnReset,
+.btnReturn {
+    border: 2px solid #161925;
+    background-color: #406E8E;
+    color: #CBF7ED;
+    font-weight: bold;
+    width: 150px;
 }
