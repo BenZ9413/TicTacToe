@@ -225,7 +225,9 @@ const Organizer = (function() {
         let container = document.createElement('div');
         container.classList = 'container';
         let gameModePlayer = document.createElement('div');
+        gameModePlayer.classList = 'contMode1v1';
         let gameModeComputer = document.createElement('div');
+        gameModeComputer.classList = 'contModeComputer';
 
         let labelPlayer = document.createElement('div');
         labelPlayer.classList = 'label';
