@@ -65,24 +65,7 @@ footer {
     color: #CBF7ED;
 }
 
-.playerNames {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    transition: 200ms ease-in-out;
-    z-index: 10;
-    background-color: white;
-    border-radius: 12px;
-    border: 3px solid black;
-    width: 350px;
-    max-width: 80%;
-}
-
-.playerNames.active {
-    transform: translate(-50%, -50%) scale(1);
-}
-
+.playerNames,
 .playerName {
     position: fixed;
     top: 50%;
@@ -93,12 +76,29 @@ footer {
     background-color: white;
     border-radius: 12px;
     border: 3px solid black;
-    width: 350px;
+    width: 230px;
     max-width: 80%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.playerNames.active {
+    transform: translate(-50%, -50%) scale(1);
 }
 
 .playerName.active {
     transform: translate(-50%, -50%) scale(1);
+}
+
+.playerContainer,
+.playerName ,
+.computerContainer {
+    padding: 15px;
+}
+
+.btnStart {
+    margin: 15px;
 }
 
 #overlay {
