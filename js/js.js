@@ -82,6 +82,7 @@ const Organizer = ((function() {
     function _prepareNewGame (e) {
         _setGameMode(e);
         _askForPlayerNamesViaModal();
+        _addClickEventStartGame();
     }
     
     // set the gameMode
@@ -95,11 +96,32 @@ const Organizer = ((function() {
         };
     };
 
-    // askForPlayerNames
+    // show Input Form that asks for Player names with one button to start the game
     function _askForPlayerNamesViaModal () {
-        alert('Please enter your names');
-        // show Input Form that asks for Player names with one button to start the game
+        let inputClass = '';
+        if (gameMode === 'computer') {
+            inputClass = '.playerName';
+        } else {
+            inputClass = '.playerNames';
+        };
+        const userForm = document.querySelector(inputClass);
+        const overlay = document.querySelector('#overlay');
+        userForm.classList.add('active');
+        overlay.classList.add('active');
     };
+
+    function _addClickEventStartGame () {
+        const btnStart = document.querySelectorAll('.btnStart');
+        btnStart.forEach (button => {
+            button.addEventListener('click', _startTheGame);
+        });
+    };
+
+    function _startTheGame () {
+        // save the player names
+        // hide the input form
+        // create grid
+    }
         
     // announceResult
         // showForm that announces the result

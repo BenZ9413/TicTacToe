@@ -8,23 +8,27 @@
 
 <body>
     <header> TicTacToe - The Game</header>
-    <main class='main'></main>
-    <form id='playerNames'>
-        <div>
-            <div>Player 1</div>
-            <input type='text' id='namePlayerOne'>
+    <main class='main'></main>    
+    <form class='playerNames'>
+        <div class='playerContainer'>
+            <div>
+                <div>Player 1</div>
+                <input type='text' id='namePlayerOne'>
+            </div>
+            <div>
+                <div>Player 2</div>
+                <input type='text' id='namePlayerTwo'>
+            </div>
         </div>
-        <div>
-            <div>Player 2</div>
-            <input type='text' id='namePlayerTwo'>
-        </div>
+        <button class='btnStart'>Start the Game</button>
     </form>
-    <form id='playerName'>
+    <form class='playerName'>
         <div>
             <div>Player 1</div>
             <input type='text' id='namePlayerSolo'>
         </div>
+        <button class='btnStart'>Start the Game</button>
     </form>
     <div id='overlay'></div>
-    <footer>BenZ</footer>
+    <footer>BenZ</footer>   
 </body>
