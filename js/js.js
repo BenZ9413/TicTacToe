@@ -77,7 +77,6 @@ const Gameboard = (function(names) {
             _savePlayerChoice(e);
             _displayPlayerChoice();
             _checkForResult();
-            
         };
     };
 
@@ -100,9 +99,6 @@ const Gameboard = (function(names) {
             });
             winPatternCount++;
         });
-
-        console.log(playerChoice);
-        console.log(winPatterns);
     };
         
     function _displayPlayerChoice () {
@@ -136,11 +132,19 @@ const Gameboard = (function(names) {
         });
     
         if (!playerChoice.includes(null)) {
-            alert('It\'s a draw!');
+            _displayResult(winner);
         } else if (winner !== '') {
-            alert(`The winner is ${winner}!`);
+            _displayResult(winner);
         } else {
             _changeTurn();
+        };
+    };
+
+    function _displayResult (result) {
+        if (result === '') {
+            alert('It\'s a draw!');
+        } else {
+            alert(`The winner is ${result}!`);
         };
     };
 
