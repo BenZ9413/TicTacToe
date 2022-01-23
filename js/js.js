@@ -19,6 +19,7 @@
 const Gameboard = (function(names) {
     // player choice array with 9 x null as value
     const playerChoice = [null, null, null, null, null, null, null, null, null];
+    const winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
 
     let player1 = '';
     let player2 = '';
@@ -75,16 +76,33 @@ const Gameboard = (function(names) {
         if (e.target.textContent == '') {
             _savePlayerChoice(e);
             _displayPlayerChoice();
-            _changeTurn();
+            _checkForResult();
+            
         };
     };
 
     // either save X or # as players choice
     function _savePlayerChoice (e) {
-        console.log(e);
-        console.log(e.target.dataset.id);
-        playerChoice[e.target.dataset.id] = 'X';
+        let playerSymbol = '#';
+        if (turn === player1) {
+            playerSymbol = 'X';
+        };
+        playerChoice[e.target.dataset.id] = playerSymbol;
+
+        let winPatternCount = 0;
+        winPatterns.forEach (pattern => {
+            let indexCount = 0;
+            pattern.forEach (index => {
+                if (index == e.target.dataset.id) {
+                    winPatterns[winPatternCount][indexCount] = playerSymbol;
+                };
+                indexCount++;
+            });
+            winPatternCount++;
+        });
+
         console.log(playerChoice);
+        console.log(winPatterns);
     };
         
     function _displayPlayerChoice () {
@@ -108,9 +126,24 @@ const Gameboard = (function(names) {
         const displayTurn = document.querySelector('.displayTurn');
         displayTurn.textContent = `It's your turn ${turn}`;
     };
-        // display the array on screen inside of the assigned grid fields
-    // checkForResult
-        // checks array for win or draw pattern
+    // checks array for win or draw pattern
+    function _checkForResult () {
+        let winner = '';
+        winPatterns.forEach (pattern => {
+            if (pattern.every( (val, i, arr) => val === arr[0] )) {
+                winner = turn;
+            };
+        });
+    
+        if (!playerChoice.includes(null)) {
+            alert('It\'s a draw!');
+        } else if (winner !== '') {
+            alert(`The winner is ${winner}!`);
+        } else {
+            _changeTurn();
+        };
+    };
+
     // reset
         // set all of the array values to null again
     // delete
