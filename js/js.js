@@ -87,6 +87,28 @@ const Gameboard = (function(names) {
             _savePlayerChoice(e);
             _displayPlayerChoice();
             _checkForResult();
+            if (player2 === undefined) {
+                let computerChoice = Math.floor(Math.random()*10);
+                while (playerChoice[computerChoice] !== null) {
+                    computerChoice = Math.floor(Math.random()*10);
+                };
+                playerChoice[computerChoice] = '#';
+
+                let winPatternCount = 0;
+                winPatterns.forEach (pattern => {
+                    let indexCount = 0;
+                    pattern.forEach (index => {
+                        if (index == computerChoice) {
+                            winPatterns[winPatternCount][indexCount] = '#';
+                        };
+                        indexCount++;
+                    });
+                    winPatternCount++;
+                });
+                _displayPlayerChoice();
+                _checkForResult();
+            
+            };
         };
     };
 
