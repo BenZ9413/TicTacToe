@@ -25,6 +25,11 @@ const Gameboard = (function(names) {
     let player2 = '';
     let turn = '';
 
+    // AI-Section
+    let possibleMoves = [];
+    let saveMoves = [];
+    let resultValues = [];
+
     // create a 3 x 3 Grid with event listeners for click
     // create text field which shows who's turn it is
     function startNewGame (names) {
@@ -33,6 +38,8 @@ const Gameboard = (function(names) {
 
         playerChoice = [null, null, null, null, null, null, null, null, null];
         winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
+
+        possibleMoves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
         turn = player1;
 
@@ -82,12 +89,40 @@ const Gameboard = (function(names) {
         });
     };
     
+    function _aiMove (possibleMoves, depth, max_player) {
+        if (depth == 1) {
+            return alert('lowest level');
+        };
+
+        let dynPossibleMoves = possibleMoves;
+        let count = 0;
+        let best_value = 0;
+
+        if (max_player) {
+            best_value = Number.NEGATIVE_INFINITY;
+
+            possibleMoves.forEach (possibleMove => {
+                dynPossibleMoves.splice(count, 1);
+                _aiMove(dynPossibleMoves, depth - 1, false);
+                count++;
+            });
+            return best_value;
+        } else {
+            best_value = Number.POSITIVE_INFINITY;
+            _aiMove(dynPossibleMoves, depth - 1, true);
+            return best_value;
+        };
+    };
+
     function _checkForValidMove (e) {
         if (e.target.textContent == '') {
             _savePlayerChoice(e);
             _displayPlayerChoice();
             _checkForResult();
             if (player2 === undefined) {
+                _aiMove(possibleMoves, possibleMoves.length, false);
+                //AI random move
+                /*
                 let computerChoice = Math.floor(Math.random()*10);
                 while (playerChoice[computerChoice] !== null) {
                     computerChoice = Math.floor(Math.random()*10);
@@ -106,7 +141,7 @@ const Gameboard = (function(names) {
                     winPatternCount++;
                 });
                 _displayPlayerChoice();
-                _checkForResult();
+                _checkForResult();*/
             
             };
         };
@@ -119,6 +154,13 @@ const Gameboard = (function(names) {
             playerSymbol = 'X';
         };
         playerChoice[e.target.dataset.id] = playerSymbol;
+
+        // AI-Section
+        saveMoves.push(playerSymbol);
+        if (possibleMoves.includes(e.target.dataset.id)) {
+            // remove value from possible moves
+            possibleMoves.splice(possibleMoves.indexOf(e.target.dataset.id), 1);
+        };
 
         let winPatternCount = 0;
         winPatterns.forEach (pattern => {
