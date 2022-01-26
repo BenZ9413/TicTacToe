@@ -89,10 +89,124 @@ const Gameboard = (function(names) {
         });
     };
     
-    function _aiMove (possibleMoves, depth, max_player) {
+    export default class Player {
+        constructor(maxDepth = -1) {
+            this.maxDepth = maxDepth;
+            this.nodesMap = new Map();
+        }
+        getBestMove(board, maximizing = true, callback = () => {}, depth = 0) {
+            //clear nodesMap if the function is called for a new move
+            if (depth == 0) this.nodesMap.clear();
+    
+            //If the board state is a terminal one, return the heuristic value
+            if (board.isTerminal() || depth === this.maxDepth) {
+                if (board.isTerminal().winner === "x") {
+                    return 100 - depth;
+                } else if (board.isTerminal().winner === "o") {
+                    return -100 + depth;
+                }
+                return 0;
+            }
+            if (maximizing) {
+                //Initialize best to the lowest possible value
+                let best = -100;
+                //Loop through all empty cells
+                board.getAvailableMoves().forEach(index => {
+                    //Initialize a new board with a copy of our current state
+                    const child = new Board([...board.state]);
+                    //Create a child node by inserting the maximizing symbol x into the current empty cell
+                    child.insert("x", index);
+                    //Recursively calling getBestMove this time with the new board and minimizing turn and incrementing the depth
+                    const nodeValue = this.getBestMove(child, false, callback, depth + 1);
+                    //Updating best value
+                    best = Math.max(best, nodeValue);
+    
+                    //If it's the main function call, not a recursive one, map each heuristic value with it's moves indices
+                    if (depth == 0) {
+                        //Comma separated indices if multiple moves have the same heuristic value
+                        const moves = this.nodesMap.has(nodeValue)
+                            ? `${this.nodesMap.get(nodeValue)},${index}`
+                            : index;
+                        this.nodesMap.set(nodeValue, moves);
+                    }
+                });
+                //If it's the main call, return the index of the best move or a random index if multiple indices have the same value
+                if (depth == 0) {
+                    let returnValue;
+                    if (typeof this.nodesMap.get(best) == "string") {
+                        const arr = this.nodesMap.get(best).split(",");
+                        const rand = Math.floor(Math.random() * arr.length);
+                        returnValue = arr[rand];
+                    } else {
+                        returnValue = this.nodesMap.get(best);
+                    }
+                    //run a callback after calculation and return the index
+                    callback(returnValue);
+                    return returnValue;
+                }
+                //If not main call (recursive) return the heuristic value for next calculation
+                return best;
+            }
+    
+            if (!maximizing) {
+                //Initialize best to the highest possible value
+                let best = 100;
+                //Loop through all empty cells
+                board.getAvailableMoves().forEach(index => {
+                    //Initialize a new board with a copy of our current state
+                    const child = new Board([...board.state]);
+    
+                    //Create a child node by inserting the minimizing symbol o into the current empty cell
+                    child.insert("o", index);
+    
+                    //Recursively calling getBestMove this time with the new board and maximizing turn and incrementing the depth
+                    let nodeValue = this.getBestMove(child, true, callback, depth + 1);
+                    //Updating best value
+                    best = Math.min(best, nodeValue);
+    
+                    //If it's the main function call, not a recursive one, map each heuristic value with it's moves indices
+                    if (depth == 0) {
+                        //Comma separated indices if multiple moves have the same heuristic value
+                        const moves = this.nodesMap.has(nodeValue)
+                            ? this.nodesMap.get(nodeValue) + "," + index
+                            : index;
+                        this.nodesMap.set(nodeValue, moves);
+                    }
+                });
+                //If it's the main call, return the index of the best move or a random index if multiple indices have the same value
+                if (depth == 0) {
+                    let returnValue;
+                    if (typeof this.nodesMap.get(best) == "string") {
+                        const arr = this.nodesMap.get(best).split(",");
+                        const rand = Math.floor(Math.random() * arr.length);
+                        returnValue = arr[rand];
+                    } else {
+                        returnValue = this.nodesMap.get(best);
+                    }
+                    //run a callback after calculation and return the index
+                    callback(returnValue);
+                    return returnValue;
+                }
+                //If not main call (recursive) return the heuristic value for next calculation
+                return best;
+            }
+        }
+    }
+
+
+    function _aiMove (currentGameBoard, possibleMoves, winPatterns, depth, max_player) {
+        
+        
         if (depth == 1) {
             return alert('lowest level');
         };
+
+        let winner = '';
+        winPatterns.forEach (pattern => {
+            if (pattern.every( (val, i, arr) => val === arr[0] )) {
+                winner = turn;
+            };
+        });
 
         let dynPossibleMoves = possibleMoves;
         let count = 0;
@@ -100,16 +214,67 @@ const Gameboard = (function(names) {
 
         if (max_player) {
             best_value = Number.NEGATIVE_INFINITY;
-
+           
             possibleMoves.forEach (possibleMove => {
+                // Copy current state of GameBoard
+                const newGameBoard = currentGameBoard;
+                // Insert possible AI Move into new Board
+                newGameBoard[possibleMove] = "#";
+                // delete AI Move from possibleMoves
                 dynPossibleMoves.splice(count, 1);
-                _aiMove(dynPossibleMoves, depth - 1, false);
+                // Insert AI Move into winPattern
+                const updtWinPatterns = winPatterns;
+                let winPatternCount = 0;
+                updtWinPatterns.forEach (pattern => {
+                    let indexCount = 0;
+                    pattern.forEach (index => {
+                        if (index == possibleMove) {
+                            updtWinPatterns[winPatternCount][indexCount] = '#';
+                        };
+                        indexCount++;
+                    });
+                    winPatternCount++;
+                });
+                // Call recursive function
+                const nodeValue = _aiMove(newGameBoard, dynPossibleMoves, updtWinPatterns, depth - 1, false);
+                // Update best value
+                best_value = Math.max(best_value, nodeValue);
                 count++;
             });
+            // If it's not the main call, return best_value for recursive calculation
             return best_value;
-        } else {
+        };
+
+        if (!max_player) {
             best_value = Number.POSITIVE_INFINITY;
-            _aiMove(dynPossibleMoves, depth - 1, true);
+
+            possibleMoves.forEach (possibleMove => {
+                // Copy current state of GameBoard
+                const newGameBoard = currentGameBoard;
+                // Insert possible AI Move into new Board
+                newGameBoard[possibleMove] = "X";
+                // delete AI Move from possibleMoves
+                dynPossibleMoves.splice(count, 1);
+                // Insert AI Move into winPattern
+                const updtWinPatterns = winPatterns;
+                let winPatternCount = 0;
+                updtWinPatterns.forEach (pattern => {
+                    let indexCount = 0;
+                    pattern.forEach (index => {
+                        if (index == possibleMove) {
+                            updtWinPatterns[winPatternCount][indexCount] = 'X';
+                        };
+                        indexCount++;
+                    });
+                    winPatternCount++;
+                });
+                // Call recursive function
+                const nodeValue = _aiMove(newGameBoard, dynPossibleMoves, updtWinPatterns, depth - 1, false);
+                // Update best value
+                best_value = Math.min(best_value, nodeValue);
+                count++;
+            });
+            // If it's not the main call, return best_value for recursive calculation
             return best_value;
         };
     };
@@ -120,7 +285,7 @@ const Gameboard = (function(names) {
             _displayPlayerChoice();
             _checkForResult();
             if (player2 === undefined) {
-                _aiMove(possibleMoves, possibleMoves.length, false);
+                _aiMove(playerChoice, possibleMoves, winPatterns, possibleMoves.length, false);
                 //AI random move
                 /*
                 let computerChoice = Math.floor(Math.random()*10);
