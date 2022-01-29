@@ -24,11 +24,10 @@ const Gameboard = (function(names) {
     let player1 = '';
     let player2 = '';
     let turn = '';
+    let finished = false;
 
     // AI-Section
     let possibleMoves = [];
-    let saveMoves = [];
-    let resultValues = [];
 
     // create a 3 x 3 Grid with event listeners for click
     // create text field which shows who's turn it is
@@ -207,7 +206,7 @@ const Gameboard = (function(names) {
             if (pattern.every( (val, i, arr) => val === arr[0] )) {
                 winner = pattern[0];
                 boardStateTerminal = true;
-            } else if (possibleMoves.length == 0) {
+            } else if (winner == '' && possibleMoves.length == 0) {
                 winner = 'draw';
                 boardStateTerminal = true;
             };
@@ -233,18 +232,21 @@ const Gameboard = (function(names) {
                 // Copy current state of GameBoard
                 const newGameBoard = [...currentGameBoard];
                 // Insert possible AI Move into new Board
-                newGameBoard[possibleMove] = "#";
+                newGameBoard[possibleMove] = "X";
                 // delete AI Move from possibleMoves
                 const dynPossibleMoves = [...possibleMoves];
                 dynPossibleMoves.splice(count, 1);
                 // Insert AI Move into winPattern
-                const updtWinPatterns = [...winPatterns];
+                const updtWinPatterns = [];
+                for (let i = 0; i< winPatterns.length; i++) {
+                    updtWinPatterns[i] = winPatterns[i].slice();
+                };
                 let winPatternCount = 0;
                 updtWinPatterns.forEach (pattern => {
                     let indexCount = 0;
                     pattern.forEach (index => {
                         if (index == possibleMove) {
-                            updtWinPatterns[winPatternCount][indexCount] = '#';
+                            updtWinPatterns[winPatternCount][indexCount] = 'X';
                         };
                         indexCount++;
                     });
@@ -289,18 +291,21 @@ const Gameboard = (function(names) {
                 // Copy current state of GameBoard
                 const newGameBoard = [...currentGameBoard];
                 // Insert possible AI Move into new Board
-                newGameBoard[possibleMove] = "X";
+                newGameBoard[possibleMove] = "#";
                 // delete AI Move from possibleMoves
                 const dynPossibleMoves = [...possibleMoves];
                 dynPossibleMoves.splice(count, 1);
                 // Insert AI Move into winPattern
-                const updtWinPatterns = [...winPatterns];
+                const updtWinPatterns = [];
+                for (let i = 0; i< winPatterns.length; i++) {
+                    updtWinPatterns[i] = winPatterns[i].slice();
+                };
                 let winPatternCount = 0;
                 updtWinPatterns.forEach (pattern => {
                     let indexCount = 0;
                     pattern.forEach (index => {
                         if (index == possibleMove) {
-                            updtWinPatterns[winPatternCount][indexCount] = 'X';
+                            updtWinPatterns[winPatternCount][indexCount] = '#';
                         };
                         indexCount++;
                     });
@@ -344,32 +349,29 @@ const Gameboard = (function(names) {
             _savePlayerChoice(e);
             _displayPlayerChoice();
             _checkForResult();
-            if (player2 === undefined) {
-                _aiMove(playerChoice, possibleMoves, winPatterns, true);
-                //AI random move
-                /*
-                let computerChoice = Math.floor(Math.random()*10);
-                while (playerChoice[computerChoice] !== null) {
-                    computerChoice = Math.floor(Math.random()*10);
-                };
-                playerChoice[computerChoice] = '#';
-
-                let winPatternCount = 0;
-                winPatterns.forEach (pattern => {
-                    let indexCount = 0;
-                    pattern.forEach (index => {
-                        if (index == computerChoice) {
-                            winPatterns[winPatternCount][indexCount] = '#';
-                        };
-                        indexCount++;
-                    });
-                    winPatternCount++;
-                });
+            if (player2 === undefined && !finished) {
+                const aiChoice = _aiMove(playerChoice, possibleMoves, winPatterns, false);
+                _saveAiChoice(aiChoice);
                 _displayPlayerChoice();
-                _checkForResult();*/
-            
+                _checkForResult();
             };
         };
+    };
+
+    function _saveAiChoice(aiChoice) {
+        playerChoice[aiChoice] = '#';
+        possibleMoves.splice(possibleMoves.indexOf(Number(aiChoice)), 1);
+        let winPatternCount = 0;
+        winPatterns.forEach (pattern => {
+            let indexCount = 0;
+            pattern.forEach (index => {
+                if (index == Number(aiChoice)) {
+                    winPatterns[winPatternCount][indexCount] = '#';
+                };
+                indexCount++;
+            });
+            winPatternCount++;
+        });
     };
 
     // either save X or # as players choice
@@ -380,13 +382,9 @@ const Gameboard = (function(names) {
         };
         playerChoice[e.target.dataset.id] = playerSymbol;
 
-        // AI-Section
-        saveMoves.push(playerSymbol);
+        // update possible Moves after player Choice
         let currMove = Number(e.target.dataset.id);
-        if (possibleMoves.includes(currMove)) {
-            // remove value from possible moves
-            possibleMoves.splice(possibleMoves.indexOf(currMove), 1);
-        };
+        possibleMoves.splice(possibleMoves.indexOf(currMove), 1);
 
         let winPatternCount = 0;
         winPatterns.forEach (pattern => {
@@ -433,8 +431,10 @@ const Gameboard = (function(names) {
     
         if (!playerChoice.includes(null)) {
             _displayResult(winner);
+            finished = true;
         } else if (winner !== '') {
             _displayResult(winner);
+            finished = true;
         } else {
             _changeTurn();
         };
