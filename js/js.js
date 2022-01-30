@@ -1,50 +1,34 @@
-// Start Screen
-    // 1 vs. 1
-    // 1 vs. Computer
-
-// 1 vs. 1
-    // Show Modal to insert the players names
-    // Player 1 starts by default
-    // Click one after another
-    // check for result
-    // display the result
-    // Offer a rematch or return to start
-
-
-
-// Factory Function for Players
-    // name
-
 // GameBoard module
 const Gameboard = (function(names) {
-    // player choice array with 9 x null as value
-    let playerChoice = [];
-    let winPatterns = [];
-
+    // setup module scoped variables
     let player1 = '';
     let player2 = '';
+    let gameboard = [];
+    let winPatterns = [];
+    let possibleMoves = [];
     let turn = '';
     let finished = false;
 
-    // AI-Section
-    let possibleMoves = [];
+    // cashe relevant dom elements
+    const main = document.querySelector('.main');
 
-    // create a 3 x 3 Grid with event listeners for click
-    // create text field which shows who's turn it is
     function startNewGame (names) {
+        _setStartValues(names);
+        _createGameBoard();
+        _addEventListenerPlayerChoice();
+    };
+
+    function _setStartValues (names) {
         player1 = names [0];
         player2 = names [1];
-
-        playerChoice = [null, null, null, null, null, null, null, null, null];
+        gameboard = [null, null, null, null, null, null, null, null, null];
         winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
-
         possibleMoves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
         turn = player1;
         finished = false;
+    };
 
-        const main = document.querySelector('.main');
-
+    function _createGameBoard () {
         const displayTurn = document.createElement('div');
         displayTurn.classList = 'displayTurn';
         displayTurn.textContent = `It's your turn ${turn}`;
@@ -57,7 +41,7 @@ const Gameboard = (function(names) {
         let countRow = 0;
         let countField = 0;
 
-        while (countRow<3) {
+        while (countRow < 3) {
             let gridRow = document.createElement('div');
             gridRow.classList = `gridRow row${countRow}`
             gridContainer.appendChild(gridRow);
@@ -72,20 +56,79 @@ const Gameboard = (function(names) {
             };
             countRow++;
         };
-        _addEventListenerPlayerChoice();
     };
 
     function _addEventListenerPlayerChoice () {
         const griedFields = document.querySelectorAll('.gridField');
         griedFields.forEach (field => {
-            field.addEventListener('click', _checkForValidMove);
+            field.addEventListener('click', _makeTheMove);
         });
     };
 
     function _removeEventListenerPlayerChoice () {
         const griedFields = document.querySelectorAll('.gridField');
         griedFields.forEach (field => {
-            field.removeEventListener('click', _checkForValidMove);
+            field.removeEventListener('click', _makeTheMove);
+        });
+    };
+
+    function _makeTheMove (e) {
+        if (_gridFieldIsEmpty(e)) {
+            _savePlayerChoice(e);
+            _updateGameboard();
+            _checkForResult();
+            if (player2 === undefined && !finished) {
+                const aiChoice = _aiMove(gameboard, possibleMoves, winPatterns, false);
+                _saveAiChoice(aiChoice);
+                _updateGameboard();
+                _checkForResult();
+            };
+        };
+    };
+
+    function _gridFieldIsEmpty (e) {
+        if (e.target.textContent == '') {
+            return true;
+        } else {
+            return false;
+        };
+    };
+
+    function _savePlayerChoice (e) {
+        let playerSymbol = '#';
+        if (turn === player1) {
+            playerSymbol = 'X';
+        };
+
+        // save player choice in gameboard
+        gameboard[e.target.dataset.id] = playerSymbol;
+
+        // update possible Moves after player Choice
+        let currMove = Number(e.target.dataset.id);
+        possibleMoves.splice(possibleMoves.indexOf(currMove), 1);
+
+        // insert player Choice in win patterns for later check
+        let winPatternCount = 0;
+        winPatterns.forEach (pattern => {
+            let indexCount = 0;
+            pattern.forEach (index => {
+                if (index == e.target.dataset.id) {
+                    winPatterns[winPatternCount][indexCount] = playerSymbol;
+                };
+                indexCount++;
+            });
+            winPatternCount++;
+        });
+    };
+        
+    function _updateGameboard () {
+        const gridFields = document.querySelectorAll('.gridField');
+        let count = 0;
+        gridFields.forEach (field => {
+            if (gameboard[count] !== null) {
+                field.textContent = gameboard[count];
+            };
+            count++;
         });
     };
     
@@ -240,23 +283,14 @@ const Gameboard = (function(names) {
         };
     };
 
-    function _checkForValidMove (e) {
-        if (e.target.textContent == '') {
-            _savePlayerChoice(e);
-            _displayPlayerChoice();
-            _checkForResult();
-            if (player2 === undefined && !finished) {
-                const aiChoice = _aiMove(playerChoice, possibleMoves, winPatterns, false);
-                _saveAiChoice(aiChoice);
-                _displayPlayerChoice();
-                _checkForResult();
-            };
-        };
-    };
-
     function _saveAiChoice(aiChoice) {
-        playerChoice[aiChoice] = '#';
+        // save ai choice in gameboard
+        gameboard[aiChoice] = '#';
+
+        // update possible moves after ai choice
         possibleMoves.splice(possibleMoves.indexOf(Number(aiChoice)), 1);
+
+        // insert ai choice in win patterns for later check
         let winPatternCount = 0;
         winPatterns.forEach (pattern => {
             let indexCount = 0;
@@ -270,53 +304,6 @@ const Gameboard = (function(names) {
         });
     };
 
-    // either save X or # as players choice
-    function _savePlayerChoice (e) {
-        let playerSymbol = '#';
-        if (turn === player1) {
-            playerSymbol = 'X';
-        };
-        playerChoice[e.target.dataset.id] = playerSymbol;
-
-        // update possible Moves after player Choice
-        let currMove = Number(e.target.dataset.id);
-        possibleMoves.splice(possibleMoves.indexOf(currMove), 1);
-
-        let winPatternCount = 0;
-        winPatterns.forEach (pattern => {
-            let indexCount = 0;
-            pattern.forEach (index => {
-                if (index == e.target.dataset.id) {
-                    winPatterns[winPatternCount][indexCount] = playerSymbol;
-                };
-                indexCount++;
-            });
-            winPatternCount++;
-        });
-    };
-        
-    function _displayPlayerChoice () {
-        const gridFields = document.querySelectorAll('.gridField');
-        let count = 0;
-        gridFields.forEach (field => {
-            if (playerChoice[count] !== null) {
-                field.textContent = playerChoice[count];
-            };
-            count++;
-        });
-    };
-
-    function _changeTurn () {
-        if (turn === player1) {
-            turn = player2;
-        } else {
-            turn = player1;
-        };
-
-        const displayTurn = document.querySelector('.displayTurn');
-        displayTurn.textContent = `It's your turn ${turn}`;
-    };
-    // checks array for win or draw pattern
     function _checkForResult () {
         let winner = '';
         winPatterns.forEach (pattern => {
@@ -325,7 +312,7 @@ const Gameboard = (function(names) {
             };
         });
     
-        if (!playerChoice.includes(null)) {
+        if (!gameboard.includes(null)) {
             _displayResult(winner);
             finished = true;
         } else if (winner !== '') {
@@ -337,7 +324,6 @@ const Gameboard = (function(names) {
     };
 
     function _displayResult (result) {
-        const main = document.querySelector('.main');
         const resultLabel = document.createElement('div');
         resultLabel.classList = 'resultLabel';
         const resultBtnContainer = document.createElement('div');
@@ -367,32 +353,40 @@ const Gameboard = (function(names) {
     };
 
     function _addClickEventToResetButton (btnReset) {
-        btnReset.addEventListener('click', _reset);
+        btnReset.addEventListener('click', _rematch);
     };
 
     function _addClickEventToReturnButton (btnReturn) {
-        btnReturn.addEventListener('click', _return);
+        btnReturn.addEventListener('click', _returnToStartScreen);
     }
 
-    // reset
-    function _reset () {
+    function _rematch () {
         _delete();
         startNewGame([player1, player2]);
     };
-        // set all of the array values to null again
-    // delete
+
+    function _returnToStartScreen () {
+        _delete();
+        Organizer.createStartScreen();
+    };
+
     function _delete () {
-        const main = document.querySelector('.main');
         while (main.firstChild) {
             main.removeChild(main.lastChild);
         };
     };
 
-    function _return () {
-        _delete();
-        Organizer.createStartScreen();
+    function _changeTurn () {
+        if (turn === player1) {
+            turn = player2;
+        } else {
+            turn = player1;
+        };
+
+        const displayTurn = document.querySelector('.displayTurn');
+        displayTurn.textContent = `It's your turn ${turn}`;
     };
-        // delete the whole grid and show start screen again
+
     return {
         startNewGame
     };
