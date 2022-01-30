@@ -390,7 +390,7 @@ const Gameboard = (function(names) {
 
     function _return () {
         _delete();
-        Organizer.askForGameMode();
+        Organizer.createStartScreen();
     };
         // delete the whole grid and show start screen again
     return {
@@ -414,9 +414,8 @@ const Organizer = (function() {
         _setupEventListenersUserForm (aiUserForm);
     })();
 
-    // askForGameMode
-        // setup the main html with two buttons and labels
-    function askForGameMode() {
+    // create the start screen to choose the game mode
+    function createStartScreen() {
         masterUserForm = '';
         
         let container = document.createElement('div');
@@ -455,16 +454,16 @@ const Organizer = (function() {
     };
     
     function _addClickEventToNewGameButtons (btnPlayer, btnComputer) {
-        btnPlayer.addEventListener('click', _prepareNewGame);
-        btnComputer.addEventListener('click', _prepareNewGame);
+        btnPlayer.addEventListener('click', _getPlayerNames);
+        btnComputer.addEventListener('click', _getPlayerNames);
     };
 
-    function _prepareNewGame (e) {
-        _setGameMode(e);
-        _showHidePlayerNamesModal();
+    function _getPlayerNames (e) {
+        _selectUserForm(e);
+        _showHideUserForm();
     };
     
-    function _setGameMode (e) {
+    function _selectUserForm (e) {
         if ((e.target.className).includes('Computer')) {
             masterUserForm = aiUserForm;
         } else {
@@ -473,18 +472,18 @@ const Organizer = (function() {
     };
 
     // show or hide Input Form that asks for Player names with one button to start the game
-    function _showHidePlayerNamesModal () {
+    function _showHideUserForm () {
         const overlay = document.querySelector('#overlay');
         masterUserForm.classList.toggle('active');
         overlay.classList.toggle('active');
     };
 
     function _setupEventListenersUserForm (modal) {
-        _addClickEventStartGame(modal);
-        _addEventListenerFormdata(modal);
+        _addSubmitEvent(modal);
+        _addOnSubmitHandler(modal);
     };
 
-    function _addClickEventStartGame (modal) {
+    function _addSubmitEvent (modal) {
         modal.addEventListener('submit', (e) => {
             e.preventDefault();
             new FormData(modal);
@@ -492,7 +491,7 @@ const Organizer = (function() {
     };
 
     //save Player names and hide input form
-    function _addEventListenerFormdata (modal) {
+    function _addOnSubmitHandler (modal) {
         modal.addEventListener('formdata', (e) => {
             let data = e.formData;
             let names = [];
@@ -500,24 +499,24 @@ const Organizer = (function() {
                 names.push(value);
             };
             modal.reset();
-            _showHidePlayerNamesModal();
-            _deleteSetupElements();
+            _showHideUserForm();
+            _deleteStartScreen();
             Gameboard.startNewGame(names);
         });
     };
 
-    function _deleteSetupElements () {
+    function _deleteStartScreen () {
         while (main.firstChild) {
             main.removeChild(main.lastChild);
         };
     };
         
     return {
-        askForGameMode
+        createStartScreen
     };
 })();
     
 // IIFE
 (function() {
-    Organizer.askForGameMode();
+    Organizer.createStartScreen();
 })();
