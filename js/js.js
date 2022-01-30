@@ -402,12 +402,17 @@ const Gameboard = (function(names) {
 const Organizer = (function() {
     // create module scoped variables
     let masterUserForm = '';
-    let first = true;
 
     // cache some document elements
     const main = document.querySelector('.main');
     const userForm = document.querySelector('.playerNames');
     const aiUserForm = document.querySelector('.playerName');
+
+    // setup event listeners for userForms to input the player names
+    (function () {
+        _setupEventListenersUserForm (userForm);
+        _setupEventListenersUserForm (aiUserForm);
+    })();
 
     // askForGameMode
         // setup the main html with two buttons and labels
@@ -457,11 +462,6 @@ const Organizer = (function() {
     function _prepareNewGame (e) {
         _setGameMode(e);
         _showHidePlayerNamesModal();
-        if (first == true) {
-            _addClickEventStartGame();
-            _addEventListenerFormdata();
-            first = false;
-        };
     };
     
     function _setGameMode (e) {
@@ -479,22 +479,27 @@ const Organizer = (function() {
         overlay.classList.toggle('active');
     };
 
-    function _addClickEventStartGame () {
-        masterUserForm.addEventListener('submit', (e) => {
+    function _setupEventListenersUserForm (modal) {
+        _addClickEventStartGame(modal);
+        _addEventListenerFormdata(modal);
+    };
+
+    function _addClickEventStartGame (modal) {
+        modal.addEventListener('submit', (e) => {
             e.preventDefault();
-            new FormData(masterUserForm);
+            new FormData(modal);
         });
     };
 
     //save Player names and hide input form
-    function _addEventListenerFormdata () {
-        masterUserForm.addEventListener('formdata', (e) => {
+    function _addEventListenerFormdata (modal) {
+        modal.addEventListener('formdata', (e) => {
             let data = e.formData;
             let names = [];
             for (let value of data.values()) {
                 names.push(value);
             };
-            masterUserForm.reset();
+            modal.reset();
             _showHidePlayerNamesModal();
             _deleteSetupElements();
             Gameboard.startNewGame(names);
