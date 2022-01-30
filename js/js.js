@@ -161,7 +161,6 @@ const Gameboard = (function(names) {
             return 0;
         };
 
-        //let dynPossibleMoves = possibleMoves;
         let count = 0;
 
         if (max_player) {
