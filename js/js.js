@@ -400,13 +400,19 @@ const Gameboard = (function(names) {
 
 // Organizer module
 const Organizer = (function() {
-    let gameMode = '';
+    // create module scoped variables
+    let masterUserForm = '';
     let first = true;
+
+    // cache some document elements
+    const main = document.querySelector('.main');
+    const userForm = document.querySelector('.playerNames');
+    const aiUserForm = document.querySelector('.playerName');
+
     // askForGameMode
         // setup the main html with two buttons and labels
     function askForGameMode() {
-        gameMode = '';
-        const main = document.querySelector('.main');
+        masterUserForm = '';
         
         let container = document.createElement('div');
         container.classList = 'container';
@@ -458,41 +464,37 @@ const Organizer = (function() {
         };
     };
     
-    // set the gameMode
     function _setGameMode (e) {
         if ((e.target.className).includes('Computer')) {
-            gameMode = '.playerName';
+            masterUserForm = aiUserForm;
         } else {
-            gameMode = '.playerNames';
+            masterUserForm = userForm;
         };
     };
 
     // show or hide Input Form that asks for Player names with one button to start the game
     function _showHidePlayerNamesModal () {
-        const userForm = document.querySelector(gameMode);
         const overlay = document.querySelector('#overlay');
-        userForm.classList.toggle('active');
+        masterUserForm.classList.toggle('active');
         overlay.classList.toggle('active');
     };
 
     function _addClickEventStartGame () {
-        const userForm = document.querySelector(gameMode);
-        userForm.addEventListener('submit', (e) => {
+        masterUserForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            new FormData(userForm);
+            new FormData(masterUserForm);
         });
     };
 
     //save Player names and hide input form
     function _addEventListenerFormdata () {
-        const userForm = document.querySelector(gameMode);
-        userForm.addEventListener('formdata', (e) => {
+        masterUserForm.addEventListener('formdata', (e) => {
             let data = e.formData;
             let names = [];
             for (let value of data.values()) {
                 names.push(value);
             };
-            userForm.reset();
+            masterUserForm.reset();
             _showHidePlayerNamesModal();
             _deleteSetupElements();
             Gameboard.startNewGame(names);
@@ -500,23 +502,17 @@ const Organizer = (function() {
     };
 
     function _deleteSetupElements () {
-        const main = document.querySelector('.main');
         while (main.firstChild) {
             main.removeChild(main.lastChild);
         };
     };
         
-    // announceResult
-        // showForm that announces the result
-        // two buttons one for rematch and one for start screen
-    // setupRematch
-        // hide the form and reset the gameBoard
     return {
         askForGameMode
     };
 })();
     
-// IFFE
+// IIFE
 (function() {
     Organizer.askForGameMode();
 })();
